@@ -1,24 +1,70 @@
+import { signInWithEmailAndPassword } from "firebase/auth";
+import auth from "../../firebase.init";
+import { useState } from "react";
+import { Link } from "react-router-dom";
+
 export default function SignIn() {
+  
+  const [success, setSuccess] = useState(false); 
+  const [loginErr, setLoginErr] = useState('');
+
+  const handleSignIn = (e) => {
+    e.preventDefault();
+
+
+    const email = e.target.email.value;
+    const pass = e.target.password.value;
+    console.log(email, pass)
+
+    // set default status
+    setSuccess(false);
+    setLoginErr('')
+
+
+    signInWithEmailAndPassword(auth, email, pass)
+    .then((res) => {
+      console.log(res.user)
+      setSuccess(true)
+    })
+    .catch((error) => {
+      console.log(error.message)
+      setSuccess(false)
+      setLoginErr(error.message)
+    })
+
+
+  }
+
+
   return (
     <div >
       <h2 className="text-3xl text-center my-10">Sign In / Log In</h2>
       <div className="card bg-base-100 max-w-xl mx-auto shrink-0 shadow-2xl">
-        <form className="card-body">
+        <form onSubmit={handleSignIn} className="card-body">
           <div className="form-control">
             <label className="label">
               <span className="label-text">Email</span>
             </label>
-            <input type="email" placeholder="email" className="input input-bordered" required />
+            <input type="email" placeholder="email" name="email" className="input input-bordered" required />
           </div>
           <div className="form-control">
             <label className="label">
               <span className="label-text">Password</span>
             </label>
-            <input type="password" placeholder="password" className="input input-bordered" required />
+            <input type="password" name="password" placeholder="password" className="input input-bordered" required />
             <label className="label">
               <a href="#" className="label-text-alt link link-hover">Forgot password?</a>
             </label>
           </div>
+          <div className="form-control w-full mx-auto mt-10">
+            <button className="btn btn-primary">Login</button>
+          </div>
+          {
+            success && <p className="text-green-700 text-center font-bold mt-10">You are signed in</p> 
+          }
+          {
+            loginErr && <p className="text-red-700 font-bold mt-10 text-center">Wrong credentials! <br /> Try again.</p>
+          }
         </form>
         <div className="divider mx-10">OR</div>
         <div className="max-w-lg mx-auto mb-5 flex justify-center gap-5">
@@ -47,10 +93,9 @@ export default function SignIn() {
             </svg>
           </span>
         </div>
+        <span className="text-center mb-5"><Link to='/signUp' className=" underline">Don't have an account ? Sign up. </Link></span>
       </div>
-      <div className="form-control max-w-xl mx-auto mt-10">
-        <button className="btn btn-primary">Login</button>
-      </div>
+
 
       {/* <div className="flex w-full flex-col border-opacity-50">
   

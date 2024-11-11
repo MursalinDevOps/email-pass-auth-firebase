@@ -2,6 +2,7 @@ import { createUserWithEmailAndPassword } from "firebase/auth";
 import auth from "../../firebase.init";
 import { useState } from "react";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
+import { Link } from "react-router-dom";
 
 
 export default function SignUp() {
@@ -96,6 +97,9 @@ export default function SignUp() {
                         <p><a href="">Accept our terms & conditions</a></p>
                     </div>
                     <button className="btn btn-primary w-full">Register</button>
+          
+                        <div className="text-center underline"><Link to='/signIn'>Already have an Account? Sign in.</Link></div>
+                 
                 </form>
                 {
                     errorMessage && <p className="text-center text-red-700 mb-5">{errorMessage}</p>

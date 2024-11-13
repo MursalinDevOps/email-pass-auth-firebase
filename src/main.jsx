@@ -6,7 +6,6 @@ import {
   RouterProvider,
 } from "react-router-dom";
 import Main from './Components/Layouts/Main';
-import Navbar from './Components/Header/Navbar';
 import SignIn from './Components/SignIn/SignIn';
 import SignUp from './Components/SignUp/SignUp';
 

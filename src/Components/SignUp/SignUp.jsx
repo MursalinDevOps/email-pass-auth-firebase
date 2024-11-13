@@ -1,4 +1,4 @@
-import { createUserWithEmailAndPassword } from "firebase/auth";
+import { createUserWithEmailAndPassword, sendEmailVerification, updateProfile } from "firebase/auth";
 import auth from "../../firebase.init";
 import { useState } from "react";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
@@ -18,8 +18,10 @@ export default function SignUp() {
 
         const email = e.target.email.value;
         const password = e.target.password.value;
+        const name = e.target.name.value;
+        const photo = e.target.photo.value;
         const terms = e.target.terms.checked;
-        console.log(terms)
+        // console.log(email, password, name, photo, terms)
 
 
 
@@ -36,7 +38,7 @@ export default function SignUp() {
             setErrorMessage('Password should contain at least one character of Uppercase, Lowercase, Number and Special symbol')
             return;
         }
-        if(!terms){
+        if (!terms) {
             setErrorMessage('Please accept our terms and conditions!');
             return;
         }
@@ -46,6 +48,21 @@ export default function SignUp() {
                 // const user = userCredentials.user;
                 console.log(userCredentials.user)
                 setSuccessMessage(true)
+                sendEmailVerification(auth.currentUser)
+                    .then(() => {
+                        console.log('Verification email sent')
+                    })
+                    const profile = {
+                        displayName:name,
+                        photoURL:photo
+                    }
+                    updateProfile(auth.currentUser, profile)
+                    .then(()=>{
+                        // console.log('user profile updated')
+                    })
+                    .catch((error)=>{
+                        // console.log('user profile update error:',error)
+                    })
             })
             .catch((error) => {
                 setErrorMessage(error.message)
@@ -71,6 +88,14 @@ export default function SignUp() {
                         </svg>
                         <input type="email" name="email" placeholder="Email" required />
                     </label>
+
+                    <label className="input input-bordered flex items-center gap-2">
+                        <input type="text" name="name" placeholder="Name" required />
+                    </label>
+                    <label className="input input-bordered flex items-center gap-2">
+                        <input type="text" name="photo" placeholder="Photo URL" required />
+                    </label>
+
                     <label className="input input-bordered flex items-center gap-2">
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
@@ -94,12 +119,12 @@ export default function SignUp() {
                             name="terms"
                             type="checkbox"
                             className="checkbox border-orange-400 [--chkbg:theme(colors.indigo.600)] [--chkfg:orange] checked:border-indigo-800" />
-                        <p><a href="">Accept our terms & conditions</a></p>
+                        <p>Accept our terms & conditions</p>
                     </div>
                     <button className="btn btn-primary w-full">Register</button>
-          
-                        <div className="text-center underline"><Link to='/signIn'>Already have an Account? Sign in.</Link></div>
-                 
+
+                    <div className="text-center underline"><Link to='/signIn'>Already have an Account? Sign in.</Link></div>
+
                 </form>
                 {
                     errorMessage && <p className="text-center text-red-700 mb-5">{errorMessage}</p>

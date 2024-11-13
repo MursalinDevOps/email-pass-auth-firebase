@@ -1,12 +1,13 @@
-import { signInWithEmailAndPassword } from "firebase/auth";
+import { sendPasswordResetEmail, signInWithEmailAndPassword } from "firebase/auth";
 import auth from "../../firebase.init";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Link } from "react-router-dom";
 
 export default function SignIn() {
-  
-  const [success, setSuccess] = useState(false); 
+
+  const [success, setSuccess] = useState(false);
   const [loginErr, setLoginErr] = useState('');
+  const emailRef = useRef();
 
   const handleSignIn = (e) => {
     e.preventDefault();
@@ -22,17 +23,32 @@ export default function SignIn() {
 
 
     signInWithEmailAndPassword(auth, email, pass)
-    .then((res) => {
-      console.log(res.user)
-      setSuccess(true)
-    })
-    .catch((error) => {
-      console.log(error.message)
-      setSuccess(false)
-      setLoginErr(error.message)
-    })
+      .then((res) => {
+        console.log(res.user)
+        if (!res.user.emailVerified) {
+          setLoginErr('Please verify your email to continue.')
+        } else {
+          setSuccess(true)
+        }
 
+      })
+      .catch((error) => {
+        console.log(error.message)
+        setSuccess(false)
+        setLoginErr(error.message)
+      })
+  }
+  const handleForgetPass = () => {
+    const email = (emailRef.current.value);
 
+    if(!email){
+      console.log('provide a valid email address!')
+    }else{
+      sendPasswordResetEmail(auth, email)
+      .then(()=>{
+        alert('password reset email sent, please check your email')
+      })
+    }
   }
 
 
@@ -45,14 +61,14 @@ export default function SignIn() {
             <label className="label">
               <span className="label-text">Email</span>
             </label>
-            <input type="email" placeholder="email" name="email" className="input input-bordered" required />
+            <input type="email" ref={emailRef} placeholder="email" name="email" className="input input-bordered" required />
           </div>
           <div className="form-control">
             <label className="label">
               <span className="label-text">Password</span>
             </label>
             <input type="password" name="password" placeholder="password" className="input input-bordered" required />
-            <label className="label">
+            <label onClick={handleForgetPass} className="label">
               <a href="#" className="label-text-alt link link-hover">Forgot password?</a>
             </label>
           </div>
@@ -60,7 +76,7 @@ export default function SignIn() {
             <button className="btn btn-primary">Login</button>
           </div>
           {
-            success && <p className="text-green-700 text-center font-bold mt-10">You are signed in</p> 
+            success && <p className="text-green-700 text-center font-bold mt-10">You are signed in</p>
           }
           {
             loginErr && <p className="text-red-700 font-bold mt-10 text-center">Wrong credentials! <br /> Try again.</p>
@@ -95,16 +111,6 @@ export default function SignIn() {
         </div>
         <span className="text-center mb-5"><Link to='/signUp' className=" underline">Don't have an account ? Sign up. </Link></span>
       </div>
-
-
-      {/* <div className="flex w-full flex-col border-opacity-50">
-  
- 
-  <div className="card bg-base-300 rounded-box grid h-20 place-items-center">content</div>
-</div> */}
-
-
-
     </div>
   )
 }
